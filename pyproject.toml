@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "notrix"
-version = "1.2.0"
+version = "1.2.1"
 description = "Notrix Official Python SDK"
 authors = ["SDK team <pythonsdk@y-faces.com>"]
 license = "MIT"
