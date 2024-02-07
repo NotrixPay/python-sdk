@@ -8,7 +8,7 @@ class Client:
     BASE_URL = "https://api.notrix.io"
 
     def __init__(self, secret_api_key: str):
-        self.secret_api_key = secret_api_key
+        self.secret_api_key = secret_api_key  # Shh its a secret!
 
     def _auth_headers(self) -> dict:
         return {f"Authorization": f"Token {self.secret_api_key}"}
