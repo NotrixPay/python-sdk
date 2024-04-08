@@ -7,8 +7,9 @@ from .models import CheckoutSessionLineItem, CheckoutSession
 class Client:
     BASE_URL = "https://api.notrix.io"
 
-    def __init__(self, secret_api_key: str):
+    def __init__(self, secret_api_key: str, projectId: str):
         self.secret_api_key = secret_api_key  # Shh its a secret!
+        self.projectId = projectId
 
     def _auth_headers(self) -> dict:
         return {f"Authorization": f"Token {self.secret_api_key}"}
@@ -28,31 +29,29 @@ class Client:
         webhook_url: str = None,
     ):
         params = {
-            "success_url": success_url,
-            "cancel_url": cancel_url,
-            "line_items": [item.dict() for item in items],
+            "successURL": success_url,
+            "cancelURL": cancel_url,
+            "lineItems": [item.dict() for item in items],
         }
         if client_reference_id is not None:
-            params.update({"client_reference_id": client_reference_id})
+            params.update({"clientReferenceID": client_reference_id})
         if webhook_url is not None:
             params.update({"webhook_url": webhook_url})
 
         response = self._make_request(
             method="post",
-            path="console/checkout-sessions/",
+            path=f"console/projects/{self.projectId}/checkout-sessions",
             json=params,
         )
 
         response.raise_for_status()
 
-        return CheckoutSession(**response.json())
+        return CheckoutSession(**(response.json()["checkoutSession"]))
 
     def is_paid(self, checkout_page_token: str) -> bool:
         response = self._make_request(
             method="get",
-            path="console/check-payment-status/",
-            params={"token": checkout_page_token},
+            path=f"console/payment-requests/{checkout_page_token}/order",
         )
-        response.raise_for_status()
 
-        return response.json()["payment_confirmed"]
+        return response.status_code == 200
